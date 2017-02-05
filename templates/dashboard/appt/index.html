@@ -1,0 +1,269 @@
+{% extends "dashboard/layout.html" %}
+
+{% load static from staticfiles %}
+{% block content %}
+
+    <!--<link rel="stylesheet" type="text/css" href="../../assets/widgets/chosen/chosen.css">-->
+    <script type="text/javascript" src="{% static 'widgets/chosen/chosen.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/chosen/chosen-demo.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/resizable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/draggable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/sortable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/selectable.js' %}"></script>
+
+    <!--<link rel="stylesheet" type="text/css" href="../../assets/widgets/calendar/calendar.css">-->
+    <script type="text/javascript" src="{% static 'widgets/daterangepicker/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/calendar/calendar.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'widgets/timepicker/timepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/daterangepicker/daterangepicker.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'widgets/daterangepicker/daterangepicker-demo.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'widgets/datepicker-ui/datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/resizable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/draggable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/sortable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/selectable.js' %}"></script>
+
+    <!-- jQueryUI Dialog -->
+
+    <!--<link rel="stylesheet" type="text/css" href="../../assets/widgets/dialog/dialog.css">-->
+    <script type="text/javascript" src="{% static 'widgets/dialog/dialog.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/dialog/dialog-demo.js' %}"></script>
+
+    <style>
+        #ui-datepicker-div {
+            padding: 5px;
+        }
+    </style>
+
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero">
+                Create Appointment for {{ fc_user.get_full_name }}
+            </h3>
+            <div class="example-box-wrapper row">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <select id="current_user" class="chosen-select">
+                                {% for user in users %}
+                                    <option value="{{ user.id }}"
+                                            {% if user == fc_user %}selected{% endif %}>{{ user.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="panel" style="margin-top: 1em;">
+                        <div class="panel-heading">
+                            <h3>Create Appointment</h3>
+                            <p>Create an appointment for {{ fc_user.get_full_name }}</p>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-horizontal bordered-row">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label">Appt Type</label>
+                                            <div class="col-sm-8">
+                                                <select name="" id="appt_type_picker" class="chosen-select">
+                                                    <option value="--">--</option>
+                                                    {% for appt_type in fc_user.appt_manager.appt_types.all %}
+                                                        <option value="{{ appt_type.id }}">{{ appt_type.name }}: {{ appt_type.minutes }}
+                                                            min.
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group" style="display: none" id="date-picker-div">
+                                            <label for="" class="col-sm-4 control-label">Date</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-prepend input-group">
+                                    <span class="add-on input-group-addon">
+                                        <i class="glyph-icon icon-calendar"></i>
+                                    </span>
+                                                    <input type="text" id="date-picker"
+                                                           class="bootstrap-datepicker form-control"
+                                                           required
+                                                           data-date-format="mm/dd/yyyy">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="eventContent" class="modal-header" title="Event Details" style="display:none;">
+                                    <div class="modal-body">
+                                        Start: <span id="startTime"></span><br>
+                                        End: <span id="endTime"></span><br><br>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <input type="text" class="form-control" id="name"
+                                                               placeholder="Your Name">
+                                                    </div>
+                                                </div>
+                                                <br/>
+                                                <div class="form-group" style="margin-top: .3em;">
+                                                    <div class="col-sm-12">
+                                                        <input type="email" class="form-control" id="email"
+                                                               placeholder="Your Email">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <button id="eventLink" class="btn btn-primary">Create</button>
+                                    </div>
+                                </div>
+                                <div id="today-calendar1" class="col-lg-12" style="display: none"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                $(document).ready(function () {
+
+                    function loadCalendar(data) {
+
+                        console.log(data["date"]);
+
+                        var calendar = $("#today-calendar1");
+
+                        if (calendar.children().length > 0) {
+                            calendar.fullCalendar('destroy');
+                        }
+
+                        calendar.fadeIn();
+
+                        calendar.fullCalendar({
+                            header: {
+                                center: '',
+                                right: ''
+                            },
+                            minTime: "{{ fc_user.appt_manager.get_min_time }}",
+                            maxTime: "{{ fc_user.appt_manager.get_max_time }}",
+                            aspectRatio: .3,
+                            slotDuration: '00:' + data["interval"] + ':00',
+                            timezone: "local",
+                            defaultView: 'agendaWeek',
+                            defaultDate: data["date"],
+                            events: data["available"],
+                            eventRender: function (event, element) {
+                                element.attr('href', 'javascript:void(0);');
+                                element.click(function () {
+                                    $("#startTime").html(moment(event.start).format('MMM Do h:mm A'));
+                                    $("#endTime").html(moment(event.end).format('MMM Do h:mm A'));
+                                    $("#eventInfo").html(event.description);
+                                    $("#eventLink").attr('href', event.url);
+                                    $("#eventContent").dialog({modal: true, title: event.title, width: 400});
+                                });
+                            }
+                        });
+
+                        $("#today-calendar1").css("min-height", $("#today-calendar1").height());
+                    }
+
+                    /* initialize the calendar
+                     -----------------------------------------------------------------*/
+                    var loadAvailable = function (user_id, appt_id, date) {
+                        // user_id: int; appt_id: int; date="mm-dd-yyyy"
+                        var data = {user_id: user_id, appt_id: appt_id, date: date};
+                        var url = "/load/appts/" + user_id;
+
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: JSON.stringify(data), // serializes the form's elements.
+                            contentType: "json",
+                            dataType: "json",
+                            accepts: {},
+                            success: function (data) {
+                                if (data["response"] == "error") {
+                                    alert(data["message"]);
+                                    return;
+                                }
+                                loadCalendar(data);
+                            },
+                            error: function (xhr) {
+                                alert('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
+                            }
+                        });
+
+                    };
+
+                    $(".bootstrap-datepicker").datepicker({
+                        minDate: new Date() // Current day
+                    });
+
+                    $("#appt_type_picker").change(function () {
+
+                        $("#date-picker-div").fadeIn();
+
+                        if ($("#date-picker").val().length > 5) {
+                            loadAvailable({{ fc_user.id }}, parseInt($("#appt_type_picker").val()), $("#date-picker").val());
+                        }
+                    });
+
+                    $("#date-picker").change(function () {
+                        var value = $(this).val();
+                        loadAvailable({{ fc_user.id }}, parseInt($("#appt_type_picker").val()), value);
+                    });
+
+
+                    $("#current_user").change(function () {
+                        var val = $(this).val();
+
+                        window.location.replace("{{ request.path }}".replace(/\/$/, "") + "?vc=" + val);
+                    });
+
+                    $("#eventLink").click(function () {
+                        var start = $("#startTime").text();
+                        var user_id = {{ fc_user.id }};
+                        var end = $("#endTime").text();
+                        var name = $("#name").val();
+                        var email = $("#email").val();
+                        var type_id = $("#appt_type_picker").val();
+
+                        var data = {
+                            start: start,
+                            user_id: user_id,
+                            end: end,
+                            name: name,
+                            email: email,
+                            type_id: type_id
+                        };
+
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ request.path }}",
+                            data: JSON.stringify(data), // serializes the form's elements.
+                            contentType: "json",
+                            dataType: "json",
+                            accepts: {},
+                            success: function (data) {
+                                if (data["response"] == "error") {
+                                    alert(data["message"]);
+                                    return;
+                                }
+                                window.location.replace("{{ request.path }}");
+                            },
+                            error: function (xhr) {
+                                alert('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
+                            }
+                        });
+
+                    });
+                });
+            </script>
+        </div>
+    </div>
+
+{% endblock %}

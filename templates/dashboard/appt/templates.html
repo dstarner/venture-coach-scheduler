@@ -1,0 +1,25 @@
+<!-- Data tables -->
+{% extends "dashboard/layout.html" %}
+
+{% load static from staticfiles %}
+{% block content %}
+    <div id="page-title">
+        <h2>View Appointment Templates</h2>
+        <p>These will get send out to your patients before and after their appointments.</p>
+    </div>
+
+    <div class="row">
+
+        {% for template in org.appt_manager.templates.all %}
+            <div class="content-box">
+                <h3 class="content-box-header bg-default">
+                    Header with default background
+                </h3>
+                <div class="content-box-wrapper">
+                    Content box body content.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

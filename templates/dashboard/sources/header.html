@@ -1,0 +1,55 @@
+{% load static from staticfiles %}
+
+<div id="page-header" class="bg-gradient-9">
+    <div id="mobile-navigation">
+        <button id="nav-toggle" class="collapsed" data-toggle="collapse" data-target="#page-sidebar">
+            <span></span></button>
+        <a href="{% url 'index' %}" class="logo-content-small" title="Venture Coach"></a>
+    </div>
+    <div id="header-logo" class="logo-bg">
+        <a href="{% url 'index' %}" class="logo-content-big" title="Venture Coach">
+            Venture Coach
+        </a>
+        <a href="{% url 'index' %}" class="logo-content-small" title="Venture Coach">
+            Venture Coach
+        </a>
+        <a id="close-sidebar" href="#" title="Close sidebar">
+            <i class="glyph-icon icon-angle-left"></i>
+        </a>
+    </div>
+    {% if request.user.is_authenticated %}
+    <div id="header-nav-left">
+        <div class="user-account-btn dropdown">
+            <a href="#" title="My Account" class="user-profile clearfix" data-toggle="dropdown">
+                <span>{{ request.user.get_short_name }}</span>
+                <i class="glyph-icon icon-angle-down"></i>
+            </a>
+            <div class="dropdown-menu float-left">
+                <div class="box-sm">
+                    <div class="login-box clearfix">
+                        <div class="user-info">
+                            <span>
+                                {{ request.user.get_full_name }}
+                            </span>
+                            <p>{{ user.email }}</p>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="pad5A button-pane button-pane-alt text-center">
+                        <a href="{% url 'logout_view' %}" class="btn display-block font-normal btn-danger">
+                            <i class="glyph-icon icon-power-off"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- #header-nav-left -->
+    {% endif %}
+    <div id="header-nav-right">
+        <a href="#" class="hdr-btn" id="fullscreen-btn" title="Fullscreen">
+            <i class="glyph-icon icon-arrows-alt"></i>
+        </a>
+    </div><!-- #header-nav-right -->
+
+</div>

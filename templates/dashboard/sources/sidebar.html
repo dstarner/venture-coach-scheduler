@@ -1,0 +1,33 @@
+<div id="page-sidebar">
+    <div class="scroll-sidebar">
+
+
+        <ul id="sidebar-menu">
+            <li class="header"><span>Appointments</span></li>
+                <li>
+                    <a href="{% url 'index' %}" title="Schedule">
+                        <i class="glyph-icon icon-linecons-diamond"></i>
+                        <span>Schedule</span>
+                    </a>
+                </li>
+            <li class="header"><span>Manage</span></li>
+            {% if request.user.is_authenticated %}
+                <li>
+                    <a href="{% url 'manage' %}" title="Manage">
+                        <i class="glyph-icon icon-linecons-diamond"></i>
+                        <span>Manage</span>
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{% url 'login_view' %}" title="Log In">
+                        <i class="glyph-icon icon-linecons-diamond"></i>
+                        <span>Log In</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul><!-- #sidebar-menu -->
+
+
+    </div>
+</div>

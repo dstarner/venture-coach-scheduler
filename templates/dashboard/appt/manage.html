@@ -1,0 +1,137 @@
+{% extends "dashboard/layout.html" %}
+
+{% load static from staticfiles %}
+{% block content %}
+
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/resizable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/draggable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/sortable.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/interactions-ui/selectable.js' %}"></script>
+
+    <!--<link rel="stylesheet" type="text/css" href="../../assets/widgets/calendar/calendar.css">-->
+    <script type="text/javascript" src="{% static 'widgets/daterangepicker/moment.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/calendar/calendar.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'widgets/timepicker/timepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'widgets/daterangepicker/daterangepicker.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'widgets/daterangepicker/daterangepicker-demo.js' %}"></script>
+
+
+    <script type="text/javascript">
+
+        /* Timepicker */
+
+        $(function () {
+            "use strict";
+            $('.timepicker-input').timepicker();
+        });
+    </script>
+
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero">
+                Manage Your Practice's Appointments and Times
+            </h3>
+            <div class="example-box-wrapper">
+                <ul class="list-group list-group-separator row list-group-icons">
+                    <li class="col-md-3 active">
+                        <a href="#create" data-toggle="tab" class="list-group-item">
+                            <i class="glyph-icon icon-user-md"></i>
+                            Create Appointment
+                        </a>
+                    </li>
+                    <li class="col-md-3">
+                        <a href="#calendar" id="render-calendar" data-toggle="tab" class="list-group-item">
+                            <i class="glyph-icon icon-calendar"></i>
+                            View Appointments
+                        </a>
+                    </li>
+                    <li class="col-md-3">
+                        <a href="#manage-hours" data-toggle="tab" class="list-group-item">
+                            <i class="glyph-icon icon-clock-o"></i>
+                            Manage Hours
+                        </a>
+                    </li>
+                    <li class="col-md-3">
+                        <a href="#add-appointment" data-toggle="tab" class="list-group-item">
+                            <i class="glyph-icon icon-plus"></i>
+                            Appointment Types
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade active in" id="create">
+                        {% include "dashboard/appt/sources/today.html" %}
+                    </div>
+                    <div class="tab-pane fade" id="calendar">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <h3 class="title-hero">
+                                    All appointments for {{ request.user.get_full_name }}
+                                </h3>
+                                <p>To view the calendar, please hit "Today" to the right. (This is a bug until we figure
+                                    it out)</p>
+                                <div class="example-box-wrapper row">
+                                    <div id="eventContent1" class="modal-header" title="Event Details"
+                                         style="display:none;">
+                                        <div class="modal-body">
+                                            Start: <span id="startTime1"></span><br>
+                                            End: <span id="endTime1"></span><br><br>
+                                            <br/>
+                                        </div>
+                                    </div>
+                                    <div id="complete" class="col-lg-12" style="margin-top: 1em"></div>
+
+                                    <script>
+                                        $(document).ready(function () {
+
+                                            // Load fullCalendar with event sources
+                                            $('#complete').fullCalendar({
+                                                header: {
+                                                    left: 'prev,next today',
+                                                    center: 'title',
+                                                    right: 'month,agendaWeek'
+                                                },
+                                                slotDuration: "00:15:00",
+                                                aspectRatio: .4,
+                                                defaultView: "agendaWeek",
+                                                timezone: "local",
+                                                eventSources: [
+                                                    "/time/month"
+                                                ],
+                                                eventRender: function (event, element) {
+                                                    element.attr('href', 'javascript:void(0);');
+                                                    element.click(function () {
+                                                        $("#startTime1").html(moment(event.start).format('MMM Do h:mm A'));
+                                                        $("#endTime1").html(moment(event.end).format('MMM Do h:mm A'));
+                                                        $("#eventInfo1").html(event.description);
+                                                        $("#eventLink1").attr('href', event.url);
+                                                        $("#eventContent1").dialog({
+                                                            modal: true,
+                                                            title: event.title,
+                                                            width: 400
+                                                        });
+                                                    });
+                                                }
+                                            });
+
+                                        });
+                                    </script>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="manage-hours">
+                        {% include "dashboard/appt/sources/manage_times.html" %}
+                    </div>
+                    <div class="tab-pane fade" id="add-appointment">
+                        {% include "dashboard/appt/sources/appt_types.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

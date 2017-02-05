@@ -1,0 +1,122 @@
+{% load time_format %}
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="content-box">
+            <div class="content-box-header">
+                <h3 class="bg-white">
+                    Exceptions (Unavailable)
+                </h3>
+            </div>
+            <div class="content-box-wrapper">
+                <p>Use this form to schedule vacations or 'off' days
+                    from your normal schedule.</p>
+                <br/>
+                <form class="form-horizontal bordered-row" role="form" method="post" action="{% url 'create_timeoff' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Reason</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="" maxlength="32"
+                                   placeholder="Christmas Vacation" name="reason" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-4 control-label">Date &amp; Time
+                            picker</label>
+                        <div class="col-sm-8">
+                            <div class="input-prepend input-group">
+                                                        <span class="add-on input-group-addon">
+                                                            <i class="glyph-icon icon-calendar"></i>
+                                                        </span>
+                                <input type="text" name="time"
+                                       id="daterangepicker-time" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-default text-center pad20A">
+                        <button class="btn btn-primary">Add TimeOff</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="content-box">
+            <h3 class="content-box-header">My Time Offs</h3>
+            <div class="content-box-wrapper">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Reason</th>
+                        <th>Dates</th>
+                        <th>Remove</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for exception in request.user.appt_manager.exceptions.all|get_dates_after_today %}
+                    <tr>
+                        <td>{{ exception.reason }}</td>
+                        <td>{{ exception|format_range|safe }}</td>
+                        <td><a href="{% url 'delete_timeoff' time_id=exception.id %}" class="btn btn-danger">Remove</a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-lg-6">
+        <div class="content-box">
+            <h3 class="content-box-header bg-white">
+                Normal Hours
+            </h3>
+            <div class="content-box-wrapper">
+                <p>The same time for start and finish will mean that you are unavailable that day.</p>
+                <hr/>
+                <form method="post" action="{% url 'save_hours' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-3 text-center">
+                                <label class="control-label">Day</label>
+                            </div>
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-3 text-center">
+                                <label class="control-label">Open</label>
+                            </div>
+                            <div class="col-sm-3 text-center">
+                                <label class="control-label">Close</label>
+                            </div>
+                        </div>
+                    </div>
+                    {% for day in request.user.appt_manager.DAYS %}
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-3 text-center">
+                                    <label class="control-label">{{ day.1 }}</label>
+                                </div>
+                                <div class="col-sm-1"></div>
+                                <div class="col-sm-3">
+                                    <div class="bootstrap-timepicker dropdown">
+                                        <input class="timepicker-input form-control"
+                                               name="{{ day.0 }}_start" value="{{ day.0|start|get_time:request.user.appt_manager}}" type="text">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="bootstrap-timepicker dropdown">
+                                        <input class="timepicker-input form-control"
+                                               name="{{ day.0 }}_end" value="{{ day.0|end|get_time:request.user.appt_manager}}" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="bg-default text-center pad20A">
+                        <button class="btn btn-primary">Save Hours</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

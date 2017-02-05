@@ -1,0 +1,315 @@
+{% extends "dashboard/layout.html" %}
+{% load static from staticfiles %}
+
+{% block content %}
+
+
+    {% include "dashboard/sources/form-sources.html" %}
+
+    <div class="row mailbox-wrapper">
+        <div class="col-md-4">
+
+            <div class="panel-layout">
+                <div class="panel-box">
+
+                    <div class="panel-content image-box">
+                        <div class="image-content font-white">
+
+                            <div class="meta-box meta-box-bottom">
+                                <img src="{{ request.user.get_image }}" alt=""
+                                     style="max-width: 50%"
+                                     class="meta-image img-bordered img-circle">
+                                <h3 class="meta-heading">{{ request.user.get_full_name }}</h3>
+                                <h4 class="meta-subheading">{{ request.user.email }}</h4>
+                            </div>
+
+                        </div>
+                        <img src="{% static 'image-resources/blurred-bg/blurred-bg-13.jpg' %}" alt="">
+
+                    </div>
+                </div>
+            </div>
+            <br/>
+            {% if org %}
+                <div class="panel-layout">
+                    <div class="panel-box">
+
+                        <div class="panel-content image-box">
+                            <div class="image-content font-white">
+
+                                <div class="meta-box meta-box-bottom">
+                                    <img src="{{ org.image.url }}" alt=""
+                                         style="max-width: 50%"
+                                         class="meta-image img-bordered img-circle">
+                                    <h3 class="meta-heading">{{ org.name }}</h3>
+                                </div>
+
+                            </div>
+                            <img src="{% static 'image-resources/blurred-bg/blurred-bg-12.jpg' %}" alt="">
+
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+
+            <div class="example-box-wrapper">
+                <ul class="list-group row list-group-icons">
+                    <li class="{% if org and request.user == org.owner %}col-md-4{% else %}col-md-6{% endif %} active">
+                        <a href="#personal" data-toggle="tab" class="list-group-item">
+                            <i class="glyph-icon icon-user"></i>
+                            Personal Information
+                        </a>
+                    </li>
+                    <li class="{% if org and request.user == org.owner %}col-md-4{% else %}col-md-6{% endif %} ">
+                        <a href="#account" data-toggle="tab" class="list-group-item">
+                            <i class="glyph-icon icon-dashboard"></i>
+                            Account Settings
+                        </a>
+                    </li>
+                    {% if org and org.owner == request.user %}
+                        <li class="col-md-4">
+                            <a href="#org" data-toggle="tab" class="list-group-item">
+                                <i class="glyph-icon icon-building"></i>
+                                Practice Information
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane pad0A fade active in" id="personal">
+                        <div class="content-box">
+                            <form class="form-horizontal pad15L pad15R bordered-row" method="post"
+                                  enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="form-group remove-border">
+                                    <label class="col-sm-3 control-label">First Name:</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" value="{{ request.user.first_name }}"
+                                               id="" placeholder="First name..." name="first">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Last Name:</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" value="{{ request.user.last_name }}"
+                                               id="" placeholder="Last name..." name="last">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Email:</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" value="{{ request.user.email }}" id=""
+                                               placeholder="Email address..." name="email">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <label class="col-sm-3 control-label">User Image</label>
+                                        <div class="col-sm-8">
+                                            <br/>
+                                            <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                <div class="fileinput-preview thumbnail" data-trigger="fileinput"
+                                                     style="width: 200px; height: 200px;">
+                                                    <img id="previewHolder"
+                                                         src="{{ request.user.get_image }}">
+                                                </div>
+                                                <div>
+                                                    <input type="file" id="filePhoto" name="image">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="button-pane mrg20T">
+                                    <button class="btn btn-info">Save</button>
+                                    <button class="btn btn-link font-gray-dark" type="reset">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="account">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="content-box mrg15B">
+                                    <h3 class="content-box-header clearfix">
+                                        Change Password
+                                    </h3>
+                                    <div class="content-box-wrapper pad0T clearfix">
+                                        <form class="form-horizontal pad15L pad15R bordered-row" method="post"
+                                              action="{% url 'dashboard:update_password' %}">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label class="col-sm-6 control-label">Old password:</label>
+                                                <div class="col-sm-6">
+                                                    <input type="password" class="form-control" id=""
+                                                           name="old_password" placeholder="Old Password" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-6 control-label">New password:</label>
+                                                <div class="col-sm-6">
+                                                    <input type="password" class="form-control" name="password" id=""
+                                                           placeholder="New Password" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-6 control-label">Repeat password:</label>
+                                                <div class="col-sm-6">
+                                                    <input type="password" class="form-control" name="confirm" id=""
+                                                           placeholder="Confirm" required>
+                                                </div>
+                                            </div>
+                                            <div class="button-pane mrg20T">
+                                                <button class="btn btn-success">Update Password</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="content-box mrg15B">
+                                    <h3 class="content-box-header clearfix">
+                                        Billing Information
+                                    </h3>
+                                    <div class="content-box-wrapper pad0T clearfix">
+                                        <form class="form-horizontal pad15L pad15R bordered-row">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">CC #:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-mask"
+                                                           data-inputmask="&apos;mask&apos;:&apos;9999-9999-9999-9999&apos;"
+                                                           id="" placeholder="0000-0000-0000-0000">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">Ex Date:</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-mask"
+                                                           data-inputmask="&apos;mask&apos;:&apos;99/9999&apos;"
+                                                           placeholder="MM/YYYY">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-4 control-label">Sec. #</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control input-mask"
+                                                           data-inputmask="&apos;mask&apos;:&apos;999&apos;"
+                                                           placeholder="123">
+                                                </div>
+                                            </div>
+                                            <div class="button-pane mrg20T">
+                                                <button class="btn btn-success">Update Card</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if org and org.owner == request.user %}
+                        <div class="tab-pane fade" id="org">
+                            <div class="content-box">
+                                <form class="form-horizontal pad15L pad15R bordered-row" method="post" action="{% url 'dashboard:edit_org' slug=org.slug %}"
+                                      enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="form-group remove-border">
+                                        <label class="col-sm-3 control-label">Practice Name:</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control"
+                                                   value="{{ org.name }}"
+                                                   id="" placeholder="My Practice" name="name">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">Address:</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control" value="{{ org.address }}"
+                                                   id="geocomplete" placeholder="197 Street Road" name="address">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">Phone:</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control input-mask" value="{{ org.format_phone }}"
+                                                   id="" data-inputmask="&apos;mask&apos;:&apos;(999) 999 - 9999&apos;"
+                                                   placeholder="(716) 111-1111" name="phone">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <label class="col-sm-3 control-label">Practice Image</label>
+                                            <div class="col-sm-8">
+                                                <br/>
+                                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                    <div class="fileinput-preview thumbnail" data-trigger="fileinput"
+                                                         style="width: 200px; height: 200px;">
+                                                        <img id="previewHolderOrg"
+                                                             src="{{ org.image.url }}">
+                                                    </div>
+                                                    <div>
+                                                        <input type="file" id="filePhotoOrg" name="image">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="button-pane mrg20T">
+                                        <button class="btn btn-info">Save</button>
+                                        <button class="btn btn-link font-gray-dark" type="reset">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="//maps.googleapis.com/maps/api/js?libraries=places"></script>
+    <script src="{% static 'helpers/jquery.geocomplete.min.js' %}"></script>
+
+    <script>
+        $(function () {
+            $("#geocomplete").geocomplete();
+
+            function readURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#previewHolder').attr('src', e.target.result);
+                    };
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            $("#filePhoto").change(function () {
+                readURL(this);
+            });
+
+            function readURLOrg(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#previewHolderOrg').attr('src', e.target.result);
+                    };
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            $("#filePhotoOrg").change(function () {
+                readURLOrg(this);
+            });
+
+        });
+
+
+    </script>
+
+{% endblock %}
+
